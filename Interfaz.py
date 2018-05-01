@@ -223,7 +223,7 @@ class fractalSignal(QWidget):
         
 #%%
     def poincSub(self):
-        x, y = Operations.graphPoinc(self.inde)
+        x, y = Operations.graphPoinc(self.shiftFullSignalNormal[self.inde])
         self.scaPoinc.setData(x, y, pen=None, symbolPen='r', symbolBrush='r', symbol='o')
         self.scaPoinc.setSize(2)
         self.poinc.addItem(self.scaPoinc)
