@@ -69,6 +69,10 @@ class fractalSignal(QWidget):
         self.btnFracInter.setDisabled(True)
         self.btnFracInter.clicked.connect(self.update)
         
+        self.btnSub = QPushButton("Graph Poincare")
+        self.btnSub.setDisabled(True)
+        self.btnSub.clicked.connect(self.poincSub)
+        
         self.btnSave = QPushButton("Save Current Data")
         self.btnSave.setDisabled(True)
         self.btnSave.clicked.connect(self.saveFile)
@@ -96,6 +100,7 @@ class fractalSignal(QWidget):
         
         buttons.addWidget(self.btnDo)
         buttons.addWidget(self.btnFracInter)
+        buttons.addWidget(self.btnSub)
         buttons.addWidget(self.btnSave)
         
         self.plot1=pg.PlotWidget()
@@ -160,8 +165,12 @@ class fractalSignal(QWidget):
                 self.fracta = Operations.fracHexa(self.shiftFullSignalNormal)
 #            elif(self.cmbFractal.currentIndex()==4): #El elemento 4
 #                self.fracta = Operations.fracOcta(self.shiftFullSignalNormal) #Llamar a la función que acabamos de crear
-                
-            x, y = Operations.graphPoinc(self.shiftFullSignalNormal)
+            
+            if(self.checkTotalSignal.isChecked()):
+                x, y = Operations.graphPoinc(self.shiftFullSignalNormal)
+                self.scaPoinc.setData(x, y, pen=None, symbolPen='r', symbolBrush='r', symbol='o')
+                self.scaPoinc.setSize(2)
+                self.poinc.addItem(self.scaPoinc)
                 
             self.scaInter.setData(self.fracta[:,3], self.fracta[:,4], pen=None, symbolPen='r', symbolBrush='r', symbol='o')
             self.scaInter.setSize(2)
@@ -169,10 +178,6 @@ class fractalSignal(QWidget):
             self.interFrac.addItem(self.scaInter)
             self.interFrac.addItem(self.roiInter)
             
-            self.scaPoinc.setData(x, y, pen=None, symbolPen='r', symbolBrush='r', symbol='o')
-            self.scaPoinc.setSize(2)
-            self.poinc.addItem(self.scaPoinc)
-           
             self.timeVector = np.asarray(range(tam)).reshape(tam,)
             self.plot1.plot(self.timeVector,self.shiftFullSignalNormal,pen='k')
             
@@ -191,6 +196,7 @@ class fractalSignal(QWidget):
         self.inde=self.pointsInRoi(self.fracta[:,3], self.fracta[:,4],selected)
         self.plot1.plot(self.inde, self.shiftFullSignalNormal[self.inde], pen=None, symbol='o', symbolPen='m', symbolBrush='m', symbolSize=6)
         self.btnSave.setEnabled(True)
+        self.btnSub.setEnabled(True)
         
 #%%
     def pointsInRoi(self, fracta1, fracta2, sel):
@@ -215,6 +221,12 @@ class fractalSignal(QWidget):
         df =pd.DataFrame(arr)
         df.to_csv(nom[0], index=False, mode='w', header=False)
         
+#%%
+    def poincSub(self):
+        x, y = Operations.graphPoinc(self.inde)
+        self.scaPoinc.setData(x, y, pen=None, symbolPen='r', symbolBrush='r', symbol='o')
+        self.scaPoinc.setSize(2)
+        self.poinc.addItem(self.scaPoinc)
 
 #%%     
 #
