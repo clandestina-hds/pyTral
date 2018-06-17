@@ -283,11 +283,24 @@ class Operations():
         return res
     
 #%%
-    def graphPoinc(signa):
-        tam = len(signa)
-        x = signa[0:tam-1]
-        y = signa[1:tam]
-        return x, y
+    def graphPoinc(s1, s2, lag):
+        t1 = len(s1)
+        t2 = len(s2)
+        lf = np.min((t1, t2))-lag
+        if (lf == 0):
+            s11=[]
+            s22=[]
+        else:
+            s11 = s1[:lf]
+            s22 = s2[lag:lag+lf]
+        return s11, s22
+
+#%%
+    def centerPoints(s1, s2):
+        length = s1.shape[0]
+        sum_x = np.sum(s1)
+        sum_y = np.sum(s2)
+        return sum_x/length, sum_y/length
             
         
         

@@ -14,12 +14,17 @@ Created on Sat Nov  5 09:52:17 2016
 
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import (QApplication, QPushButton, QSplitter, QFileDialog, QMessageBox, QLabel, QComboBox,QWidget, QCheckBox)
+from PyQt5.QtWidgets import (QApplication, QPushButton, QSplitter, QFileDialog, QMessageBox, QLabel, QComboBox,QWidget, QCheckBox, 
+                             QLineEdit, QFormLayout)
 from PyQt5.QtCore import Qt
 import pyqtgraph as pg 
 from Operations import Operations
 import numpy as np
 import pandas as pd
+
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+import seaborn as sns
 
 #%%
 class fractalSignal(QWidget):
@@ -30,6 +35,19 @@ class fractalSignal(QWidget):
 #%% 
     def initUI(self):
         pg.setConfigOption('background', 'w')
+        
+        params = {
+                'figure.figsize': [4, 4],
+                'figure.dpi': 300,
+                'savefig.dpi': 300
+           }
+        plt.rcParams.update(params)
+        
+        sns.set()
+        sns.set_style("white")
+        sns.set_palette("muted")
+        sns.set_context("paper")
+        
         self.fullSignal=[]
         self.shiftFullSignal=[]
         self.shiftFullSignalNormal=[]
@@ -43,18 +61,22 @@ class fractalSignal(QWidget):
         buttons = QtWidgets.QVBoxLayout()
         graphics = QtWidgets.QVBoxLayout()
         imaFrac = QtWidgets.QHBoxLayout()
+        lagBox = QFormLayout()
+        results =  QFormLayout()
        
         self.btnLoadSig = QPushButton('Load Signal')
         self.btnLoadSig.clicked.connect(self.loadSignal)
-        self.btnLoadSig.setStyleSheet("background-color:#fbe9e7")
+        self.btnLoadSig.setStyleSheet("background-color:#fbe9e7; font-size: 18px")
         
         self.lblSignal = QLabel('')
+        self.lblSignal.setStyleSheet("font-size: 18px")
         
         self.checkTotalSignal = QCheckBox('Signal', self)
+        self.checkTotalSignal.setStyleSheet("font-size: 18px")
         
 
         self.cmbFractal = QComboBox()
-        self.cmbFractal.setStyleSheet("background-color:#fbe9e7")
+        self.cmbFractal.setStyleSheet("background-color:#fbe9e7; font-size: 18px")
         self.cmbFractal.addItem("Triangle") #Elemento 0
         self.cmbFractal.addItem("Square") #Elemento 1
         self.cmbFractal.addItem("Pentagon") #Elemento 2
@@ -63,23 +85,71 @@ class fractalSignal(QWidget):
         
         self.btnDo = QPushButton("Do Fractal")
         self.btnDo.setDisabled(True)
+        self.btnDo.setStyleSheet("font-size: 18px")
         self.btnDo.clicked.connect(self.showDialog)
 
         self.btnFracInter = QPushButton("Points-Inter")
         self.btnFracInter.setDisabled(True)
+        self.btnFracInter.setStyleSheet("font-size: 18px")
         self.btnFracInter.clicked.connect(self.update)
+        
+        self.txtLag = QLineEdit('0')
+        self.txtLag.setStyleSheet("font-size: 18px")
+        self.txtLag.setEnabled(True)
+        lblLag = QLabel("LAG")
+        lblLag.setStyleSheet("font-size: 18px")
+        
+        lagBox.addRow(lblLag,  self.txtLag)
         
         self.btnSub = QPushButton("Graph Poincare")
         self.btnSub.setDisabled(True)
+        self.btnSub.setStyleSheet("font-size: 18px")
         self.btnSub.clicked.connect(self.poincSub)
+        
+        self.lblsd1 = QLabel("SD1: ")
+        self.lblsd1.setEnabled(True)  
+        self.lblsd1.setStyleSheet("font-size: 18px")
+        self.txtsd1 = QLineEdit('')
+        self.txtsd1.setEnabled(True)
+        self.txtsd1.setStyleSheet("font-size: 18px")
+        
+        self.lblsd2 = QLabel("SD2: ")
+        self.lblsd2.setEnabled(True) 
+        self.lblsd2.setStyleSheet("font-size: 18px")
+        self.txtsd2 = QLineEdit('')
+        self.txtsd2.setEnabled(True)
+        self.txtsd2.setStyleSheet("font-size: 18px")
+        
+        self.lblc1 = QLabel("C11: ")
+        self.lblc1.setEnabled(True)  
+        self.lblc1.setStyleSheet("font-size: 18px")
+        self.txtc1 = QLineEdit('')
+        self.txtc1.setEnabled(True)
+        self.txtc1.setStyleSheet("font-size: 18px")
+        
+        self.lblc2 = QLabel("C2: ")
+        self.lblc2.setEnabled(True) 
+        self.lblc2.setStyleSheet("font-size: 18px")
+        self.txtc2 = QLineEdit('')
+        self.txtc2.setEnabled(True)
+        self.txtc2.setStyleSheet("font-size: 18px")
+        
+        results.addRow(self.lblsd1, self.txtsd1)
+        results.addRow(self.lblsd2, self.txtsd2)
+        results.addRow(self.lblc1, self.txtc1)
+        results.addRow(self.lblc2, self.txtc2)
         
         self.btnSave = QPushButton("Save Current Data")
         self.btnSave.setDisabled(True)
+        self.btnSave.setStyleSheet("font-size: 18px")
         self.btnSave.clicked.connect(self.saveFile)
         
         self.viewBox=pg.GraphicsLayoutWidget()
-        self.interFrac = self.viewBox.addViewBox(row=0, col=0, lockAspect=True)
-        self.poinc = self.viewBox.addViewBox(row=0, col=1, lockAspect=True)
+        self.interFrac = self.viewBox.addPlot()#ViewBox(row=0, col=0, lockAspect=True)
+        self.interFrac.setYRange(-0.1, 1.1, padding=0)
+        self.interFrac.setXRange(-0.1, 1.1, padding=0)
+
+        self.poinc = self.viewBox.addPlot()#ViewBox(row=0, col=1, lockAspect=True)
         
         self.scaInter=pg.ScatterPlotItem()
         self.scaPoinc=pg.ScatterPlotItem()
@@ -95,12 +165,16 @@ class fractalSignal(QWidget):
         
         buttons.addWidget(self.checkTotalSignal)
         
-        buttons.addWidget(QLabel("Fractal Type"))
+        nomFractal = QLabel("Fractal Type")
+        nomFractal.setStyleSheet("font-size: 18px")
+        buttons.addWidget(nomFractal)
         buttons.addWidget(self.cmbFractal)
         
         buttons.addWidget(self.btnDo)
         buttons.addWidget(self.btnFracInter)
+        buttons.addLayout(lagBox)
         buttons.addWidget(self.btnSub)
+        buttons.addLayout(results)
         buttons.addWidget(self.btnSave)
         
         self.plot1=pg.PlotWidget()
@@ -125,7 +199,7 @@ class fractalSignal(QWidget):
     def loadSignal(self):
         self.fSig = QFileDialog.getOpenFileName(None, 'Open file', '/home')
         if(self.fSig[0] !=''):
-            self.btnLoadSig.setStyleSheet("background-color:#e8f5e9")
+            self.btnLoadSig.setStyleSheet("background-color:#e8f5e9; font-size: 18px")
             names=str.split(self.fSig[0],"/")
             t=len(names)
             self.lblSignal.setText(names[t-1])
@@ -143,7 +217,8 @@ class fractalSignal(QWidget):
 #%%     
     def showDialog(self):
         if(self.fSig[0] !=''):
-            self.btnDo.setStyleSheet("background-color:#e8f5e9")
+            self.plot1.clear()
+            self.btnDo.setStyleSheet("background-color:#e8f5e9; font-size: 18px")
             self.fullSignal = pd.read_csv(self.fSig[0], header=None)
             self.fullSignal = self.fullSignal.as_matrix()
             self.shiftFullSignal = Operations.shiftSignal(self.fullSignal)
@@ -167,17 +242,44 @@ class fractalSignal(QWidget):
 #                self.fracta = Operations.fracOcta(self.shiftFullSignalNormal) #Llamar a la función que acabamos de crear
             
             if(self.checkTotalSignal.isChecked()):
-                x, y = Operations.graphPoinc(self.shiftFullSignalNormal)
-                self.scaPoinc.setData(x, y, pen=None, symbolPen='r', symbolBrush='r', symbol='o')
-                self.scaPoinc.setSize(2)
+                self.scaPoinc.clear()
+                x, y = Operations.graphPoinc(self.shiftFullSignalNormal, self.shiftFullSignalNormal, 1)
+                c1, c2 = Operations.centerPoints(self.shiftFullSignalNormal,self.shiftFullSignalNormal)
+                tam = y.shape[0]
+                print(x.shape)
+                print(y.shape)
+                spots = [{'pos': [x[i], y[i]], 'data': 1, 'brush':pg.intColor(2,3,alpha=120), 'symbol': 'o', 'size': 10} for i in range(tam)]
+                spots.append({'pos': [c1, c2], 'data': 1, 'brush':pg.intColor(3,3,alpha=255), 'symbol': 'o', 'size': 10})
+                self.scaPoinc.addPoints(spots)
                 self.poinc.addItem(self.scaPoinc)
+                sd1 = (np.std(x-y))/(np.sqrt(2))
+                sd2 = (np.std(x+y))/(np.sqrt(2))
+                self.txtsd1.setText(str(sd1))
+                self.txtsd2.setText(str(sd2))
+                self.txtc1.setText(str(c1))
+                self.txtc2.setText(str(c2))
+                
+                fig = plt.figure()
+                ax = fig.add_subplot(111, aspect='equal')
+                ax.plot(x,y, 'b.', alpha=0.5, lw=2)
+                ax.plot(c1,c2,'r.')
+                el = Ellipse((c1, c2), sd1*2, sd2*2, fill=False, angle=-45, linewidth=1, zorder=2,color='r')
+                el.set_clip_box(ax.bbox)
+                ax.add_artist(el)
+                sns.despine()
+                
+                nom = self.lblSignal.text()+'.png'
+                print(nom)
+                plt.savefig(nom, transparent=False)
+                plt.show()
+
                 
             self.scaInter.setData(self.fracta[:,3], self.fracta[:,4], pen=None, symbolPen='r', symbolBrush='r', symbol='o')
-            self.scaInter.setSize(2)
+            self.scaInter.setSize(3)
             
             self.interFrac.addItem(self.scaInter)
             self.interFrac.addItem(self.roiInter)
-            
+            tam = len(self.shiftFullSignalNormal)
             self.timeVector = np.asarray(range(tam)).reshape(tam,)
             self.plot1.plot(self.timeVector,self.shiftFullSignalNormal,pen='k')
             
@@ -215,18 +317,43 @@ class fractalSignal(QWidget):
     def saveFile(self):
         nom = QFileDialog.getSaveFileName(None, 'Saving Data in Current Plot','', '*.csv')
         tam=len(self.inde)
-        arr=np.zeros((tam,2))
-        arr[:,0]=self.inde
-        arr[:,1]=self.shiftFullSignalNormal[self.inde]
+        arr=np.zeros((tam,1))
+#        arr[:,0]=self.inde
+        arr[:,0]=self.shiftFullSignalNormal[self.inde]
         df =pd.DataFrame(arr)
         df.to_csv(nom[0], index=False, mode='w', header=False)
         
 #%%
     def poincSub(self):
-        x, y = Operations.graphPoinc(self.shiftFullSignalNormal[self.inde])
-        self.scaPoinc.setData(x, y, pen=None, symbolPen='r', symbolBrush='r', symbol='o')
-        self.scaPoinc.setSize(2)
+        self.scaPoinc.clear()
+        lag = int(self.txtLag.text())
+        x, y = Operations.graphPoinc(self.shiftFullSignalNormal[self.inde], self.shiftFullSignalNormal[self.inde], lag)
+        c1, c2 = Operations.centerPoints(self.shiftFullSignalNormal[self.inde],self.shiftFullSignalNormal[self.inde])
+        tam = x.shape[0]
+        spots = [{'pos': [x[i], y[i]], 'data': 1, 'brush':pg.intColor(2,3,alpha=120), 'symbol': 'o', 'size': 10} for i in range(tam)]
+        spots.append({'pos': [c1, c2], 'data': 1, 'brush':pg.intColor(3,3,alpha=255), 'symbol': 'o', 'size': 10})
+        self.scaPoinc.addPoints(spots)
         self.poinc.addItem(self.scaPoinc)
+        sd1 = (np.std(x-y))/(np.sqrt(2))
+        sd2 = (np.std(x+y))/(np.sqrt(2))
+        self.txtsd1.setText(str(sd1))
+        self.txtsd2.setText(str(sd2))
+        self.txtc1.setText(str(c1))
+        self.txtc2.setText(str(c2))
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111, aspect='equal')
+        ax.plot(x,y, 'b.', alpha=0.5, lw=2)
+        ax.plot(c1,c2,'r.')
+        el = Ellipse((c1, c2), sd1*2, sd2*2, fill=False, angle=-45, linewidth=1, zorder=2,color='r')
+        el.set_clip_box(ax.bbox)
+        ax.add_artist(el)
+        sns.despine()
+        
+        nom = self.lblSignal.text()+'.png'
+        print(nom)
+        plt.savefig(nom, transparent=False)
+        plt.show()
 
 #%%     
 #
