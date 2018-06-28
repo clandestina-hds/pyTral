@@ -1,11 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jun 20 00:59:26 2017
-
-@author: Clandestina
-"""
-
 import numpy as np
+from scipy.signal import butter, filtfilt
 
 class Operations():
 #%%
@@ -301,6 +295,19 @@ class Operations():
         sum_x = np.sum(s1)
         sum_y = np.sum(s2)
         return sum_x/length, sum_y/length
+    
+#%%
+    def butter_lowpass(cutoff, fs, order=5):
+        nyq = 0.5 * fs
+        normal_cutoff = cutoff / nyq
+        b, a = butter(order, normal_cutoff, btype='low', analog=False)
+        return b, a
+
+#%%
+    def butter_lowpass_filter(data, cutoff, fs, order=5):
+        b, a = Operations.butter_lowpass(cutoff, fs, order=order)
+        y = filtfilt(b, a, data)
+        return y
             
         
         
