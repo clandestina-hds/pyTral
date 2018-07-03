@@ -60,10 +60,19 @@ class cutSignals(QHBoxLayout):
                 self.intervalos.append((ini, fin, fin - ini))
                 ini = i[1]
             self.intervalos.append((ini, tam, tam - ini))
-            
-        nuevaSenial=self.y[self.segmentos[0,0]:self.segmentos[0,1]]
-        df=pd.DataFrame(nuevaSenial)
-        df.to_csv(self.nombreSenial[0]+'-Cortada.csv',index=False,mode='w')
+        cont=1
+        for i in self.segmentos:
+            nuevaS=self.y[i[0]:i[1]]
+            df=pd.DataFrame(nuevaS)
+            df.to_csv(self.nombreSenial[0]+'Seg-'+str(cont)+'.csv',index=False,header=False,mode='w')
+            cont=cont+1
+        cont=1
+        for i in self.intervalos:
+            nuevaS=self.y[i[0]:i[1]]
+            df=pd.DataFrame(nuevaS)
+            df.to_csv(self.nombreSenial[0]+'Interv-'+str(cont)+'.csv',index=False,header=False,mode='w')
+            cont=cont+1
+
         df = pd.DataFrame(self.segmentos)
         df.to_csv(self.nombreSenial[0]+'-CortadaIntervalos.csv',index=False, header = ['Inicio','Fin','Size'], mode = 'w')
 
@@ -99,21 +108,25 @@ class cutSignals(QHBoxLayout):
         #Region for segment in signal
         self.lr = pg.LinearRegionItem([300,500])
         
-        btnLoadSig = QPushButton('Cargar Senial')
+        btnLoadSig = QPushButton('Load Signal')
         btnLoadSig.clicked.connect(self.cargarSenial)
+        btnLoadSig.setStyleSheet("font-size: 18px")
         
         self.valorContador = QLabel('')
         
         btnIniciar = QPushButton('Start')
         btnIniciar.clicked.connect(self.enabledButtons)
+        btnIniciar.setStyleSheet("font-size: 18px")
         
         self.btnAdd=QPushButton('Add Segment')
         self.btnAdd.clicked.connect(self.addInterval)
         self.btnAdd.setEnabled(False)
+        self.btnAdd.setStyleSheet("font-size: 18px")
         
         self.btnSegments=QPushButton('End Segmentation')
         self.btnSegments.clicked.connect(self.saveData)
         self.btnSegments.setEnabled(False)
+        self.btnSegments.setStyleSheet("font-size: 18px")
 
 
         #################################################################

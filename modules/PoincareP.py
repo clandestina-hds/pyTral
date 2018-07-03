@@ -23,14 +23,14 @@ class PoincareP(QHBoxLayout):
         if (bot==1):
             self.nameS1 = QFileDialog.getOpenFileName(None, 'Open file', '/home')
             if(self.nameS1[0] !=''):
-                self.btnLoadS1.setStyleSheet("background-color:#e8f5e9")
+                self.btnLoadS1.setStyleSheet("background-color:#e8f5e9; font-size: 18px")
                 names=str.split(self.nameS1[0],"/")
                 t=len(names)
                 self.lblS1.setText(names[t-1])
         elif (bot==2):
             self.nameS2=QFileDialog.getOpenFileName(None, 'Open file', '/home')
             if(self.nameS2[0]!=''):
-                self.btnLoadS2.setStyleSheet("background-color:#e8f5e9")
+                self.btnLoadS2.setStyleSheet("background-color:#e8f5e9; font-size: 18px")
                 names=str.split(self.nameS2[0],"/")
                 t=len(names)
                 self.lblS2.setText(names[t-1])
@@ -142,31 +142,42 @@ class PoincareP(QHBoxLayout):
         #Componentes de panel botones
         self.btnLoadS1 = QPushButton('Load S1')
         self.btnLoadS1.clicked.connect(lambda: self.loadSignal(1))
-        self.btnLoadS1.setStyleSheet("background-color:#fbe9e7")
+        self.btnLoadS1.setStyleSheet("background-color:#fbe9e7; font-size: 18px")
         self.lblS1 = QLabel('')
+        self.lblS1.setStyleSheet("font-size: 18px")
         
         self.btnLoadS2 = QPushButton('Load S2')
         self.btnLoadS2.clicked.connect(lambda: self.loadSignal(2))
-        self.btnLoadS2.setStyleSheet("background-color:#fbe9e7")       
+        self.btnLoadS2.setStyleSheet("background-color:#fbe9e7; font-size: 18px")      
         self.lblS2 = QLabel('')
+        self.lblS2.setStyleSheet("font-size: 18px")
         
         self.txtLag = QLineEdit('0')
         self.txtLag.setEnabled(True)
+        self.txtLag.setStyleSheet("font-size: 18px")  
         
-        lagBox.addRow("LAG",  self.txtLag)
+        lblLag = QLabel("LAG")
+        lblLag.setStyleSheet("font-size: 18px")  
+        
+        lagBox.addRow(lblLag,  self.txtLag)
         
         self.checkFilter = QCheckBox('Filter Apply')
         self.checkFilter.toggled.connect(self.enableFields)
+        self.checkFilter.setStyleSheet("font-size: 18px")
         
         self.lblGrade = QLabel("Filter Grade")
-        self.lblGrade.setDisabled(True)        
+        self.lblGrade.setDisabled(True)  
+        self.lblGrade.setStyleSheet("font-size: 18px")
         self.txtN = QLineEdit('3')
         self.txtN.setDisabled(True)
+        self.txtN.setStyleSheet("font-size: 18px")
         
         self.lblFc = QLabel("Cut Frequency")
-        self.lblFc.setDisabled(True)        
+        self.lblFc.setDisabled(True) 
+        self.lblFc.setStyleSheet("font-size: 18px")
         self.txtFc = QLineEdit('10')
         self.txtFc.setDisabled(True)
+        self.txtFc.setStyleSheet("font-size: 18px")
         
         filterBox.addRow(self.lblGrade, self.txtN)
         filterBox.addRow(self.lblFc, self.txtFc)
@@ -174,30 +185,39 @@ class PoincareP(QHBoxLayout):
         self.btnDo = QPushButton("Do")
         self.btnDo.setEnabled(True)
         self.btnDo.clicked.connect(self.showDialog)
+        self.btnDo.setStyleSheet("font-size: 18px")
     
         #Componentes de panel Gráficas
         self.poinc = viewBox.addPlot(row=0, col=1, lockAspect=True)
         self.scaPoinc=pg.ScatterPlotItem()
 
         self.lblsd1 = QLabel("SD1: ")
-        self.lblsd1.setEnabled(True)        
+        self.lblsd1.setEnabled(True)  
+        self.lblsd1.setStyleSheet("font-size: 18px")
         self.txtsd1 = QLineEdit('')
         self.txtsd1.setEnabled(True)
+        self.txtsd1.setStyleSheet("font-size: 18px")
         
         self.lblsd2 = QLabel("SD2: ")
-        self.lblsd2.setEnabled(True)        
+        self.lblsd2.setEnabled(True)  
+        self.lblsd2.setStyleSheet("font-size: 18px")
         self.txtsd2 = QLineEdit('')
         self.txtsd2.setEnabled(True)
+        self.txtsd2.setStyleSheet("font-size: 18px")
         
         self.lblc1 = QLabel("C11: ")
-        self.lblc1.setEnabled(True)        
+        self.lblc1.setEnabled(True)  
+        self.lblc1.setStyleSheet("font-size: 18px")
         self.txtc1 = QLineEdit('')
         self.txtc1.setEnabled(True)
+        self.txtc1.setStyleSheet("font-size: 18px")
         
         self.lblc2 = QLabel("C2: ")
-        self.lblc2.setEnabled(True)        
+        self.lblc2.setEnabled(True)  
+        self.lblc2.setStyleSheet("font-size: 18px")
         self.txtc2 = QLineEdit('')
         self.txtc2.setEnabled(True)
+        self.txtc2.setStyleSheet("font-size: 18px")
         
         results.addRow(self.lblsd1, self.txtsd1)
         results.addRow(self.lblsd2, self.txtsd2)
